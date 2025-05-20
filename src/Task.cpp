@@ -22,7 +22,7 @@ ilrd::Task& ilrd::Task::operator=(const Task &rhs)
 {
     if (this != &rhs)
     {
-        auto* func = new boost::function<void()>(*rhs.m_func);
+        auto func = new boost::function<void()>(*rhs.m_func);
         delete m_func;
         m_func = func;
     }

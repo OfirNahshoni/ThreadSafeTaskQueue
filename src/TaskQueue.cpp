@@ -3,23 +3,21 @@
 #include "TaskQueue.hpp"
 
 ilrd::TaskQueue::TaskQueue() : m_numWorkers(0),
+                                m_delQueue(100),
+                                m_tasksQueue(100),
+                                m_isFinish(false),
                                 m_isRunning(false),
                                 m_threadsCount(0)
 { }
 
 ilrd::TaskQueue::~TaskQueue()
 {
-    if (m_isRunning.load())
-    {
-        Stop();
-    }
+    Stop();
 
-    boost::unique_lock<boost::mutex> lock(m_mutex);
-
-    // wait for all worker threads to finish
-    while (m_threadsCount != m_numWorkers)
+    while (!m_isFinish.load())
     {
-        m_condDone.wait(lock);
+        boost::unique_lock<boost::mutex> lock(m_lock);
+        m_condIsFinish.wait(lock);
     }
 }
 
@@ -30,23 +28,26 @@ void ilrd::TaskQueue::AddTask(Task* task)
 
 void ilrd::TaskQueue::Start(size_t numWorkers)
 {
-    if (!m_isRunning.load())
+    if (m_isRunning.load())
     {
-        m_isRunning.store(true);
-        m_threadsCount.store(0);
-        m_numWorkers = numWorkers;
+        return;
+    }
 
-        for (size_t i = 0; i < numWorkers; ++i)
-        {
-            m_threadsMap[i] = boost::thread(ThreadWork,
-                                                    boost::ref(*this), i);
-        }
+    m_isRunning.store(true);
+    m_numWorkers = numWorkers;
+
+    for (size_t i = 0; i < numWorkers; ++i)
+    {
+        m_threadsMap[i] = boost::thread(ThreadWork, boost::ref(*this), i);
     }
 }
 
 void ilrd::TaskQueue::Stop()
 {
-    m_isRunning.store(false);
+    if (!m_isRunning.load())
+    {
+        return;
+    }
 
     // push destroy tasks
     for (size_t i = 0; i < m_numWorkers; ++i)
@@ -64,10 +65,10 @@ void ilrd::TaskQueue::Stop()
         m_delQueue.Pop(idx);
         m_threadsMap.at(idx).join();
         m_threadsMap.erase(idx);
-        ++m_threadsCount;
     }
 
-    m_condDone.notify_all();
+    m_isFinish.store(true);
+    m_condIsFinish.notify_all();
 }
 
 void ilrd::TaskQueue::DestroyFunc(TaskQueue& taskQueue)

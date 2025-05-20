@@ -2,7 +2,7 @@
 
 #include "TaskQueue.hpp"
 
-void AddTasksToQueue(ilrd::TaskQueue& taskQueue, size_t numTasks = 9);
+void AddTasksToQueue(ilrd::TaskQueue& taskQueue, size_t numTasks = 10);
 void TestsBasic();
 
 int main()
@@ -19,7 +19,7 @@ void AddTasksToQueue(ilrd::TaskQueue& taskQueue, size_t numTasks)
         taskQueue.AddTask(new ilrd::Task([i]
         {
             std::cout << "task " << i + 1 << std::endl;
-            boost::this_thread::sleep_for(boost::chrono::milliseconds(1500));
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
         }));
     }
 }
@@ -28,11 +28,19 @@ void TestsBasic()
 {
     ilrd::TaskQueue taskQueue;
 
-    AddTasksToQueue(taskQueue, 15);
+    AddTasksToQueue(taskQueue, 4);
+    taskQueue.Start(1);
+    taskQueue.Stop();
+
+    AddTasksToQueue(taskQueue, 8);
     taskQueue.Start(2);
     taskQueue.Stop();
 
-    AddTasksToQueue(taskQueue, 100);
-    taskQueue.Start(30);
+    AddTasksToQueue(taskQueue, 12);
+    taskQueue.Start(3);
     taskQueue.Stop();
+
+    // AddTasksToQueue(taskQueue, 16);
+    // taskQueue.Start(4);
+    // taskQueue.Stop();
 }

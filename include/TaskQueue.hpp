@@ -5,7 +5,7 @@
 #include <boost/unordered_map.hpp>          // boost::unordered_map
 #include <boost/atomic/atomic.hpp>          // boost::atomic_bool, atomic_uint
 
-#include "TSQueue.hpp"                      // TSQueue
+#include "TSQueue.hpp"                      // ilrd::TSQueue
 
 namespace ilrd
 {
@@ -21,12 +21,13 @@ public:
 
 private:
     size_t m_numWorkers;
-    boost::mutex m_mutex;
-    boost::atomic_bool m_isRunning;
-    boost::atomic_uint m_threadsCount;
-    boost::condition_variable m_condDone;
+    boost::mutex m_lock;
     TSQueue<size_t> m_delQueue;
     TSQueue<Task*> m_tasksQueue;
+    boost::atomic_bool m_isFinish;
+    boost::atomic_bool m_isRunning;
+    boost::atomic_uint m_threadsCount;
+    boost::condition_variable m_condIsFinish;
     boost::unordered_map<size_t, boost::thread> m_threadsMap;
 
     TaskQueue(const TaskQueue& other) = delete;
