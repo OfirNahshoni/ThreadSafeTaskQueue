@@ -19,7 +19,7 @@ void AddTasksToQueue(ilrd::TaskQueue& taskQueue, size_t numTasks)
         taskQueue.AddTask(new ilrd::Task([i]
         {
             std::cout << "task " << i + 1 << std::endl;
-            boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(500));
         }));
     }
 }
@@ -32,15 +32,15 @@ void TestsBasic()
     taskQueue.Start(1);
     taskQueue.Stop();
 
-    AddTasksToQueue(taskQueue, 8);
+    AddTasksToQueue(taskQueue, 6);
     taskQueue.Start(2);
     taskQueue.Stop();
 
-    AddTasksToQueue(taskQueue, 12);
+    AddTasksToQueue(taskQueue, 8);
     taskQueue.Start(3);
     taskQueue.Stop();
 
-    // AddTasksToQueue(taskQueue, 16);
-    // taskQueue.Start(4);
-    // taskQueue.Stop();
+    AddTasksToQueue(taskQueue);
+    taskQueue.Start(4);
+    taskQueue.Stop();
 }

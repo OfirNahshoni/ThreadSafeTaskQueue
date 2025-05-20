@@ -14,7 +14,7 @@ template <typename T>
 class TSQueue
 {
 public:
-    TSQueue(size_t numElements = 10);
+    TSQueue(size_t numElements = 0);
     ~TSQueue() = default;
     void Push(const T& element);
     void Pop(T& outElement);
@@ -32,13 +32,9 @@ TSQueue<T>::TSQueue(size_t numElements) : m_queue(numElements)
 template <typename T>
 void TSQueue<T>::Push(const T& element)
 {
+    m_queue.push(element);
+
     boost::unique_lock<boost::mutex> lock(m_lock);
-
-    while (!m_queue.push(element))
-    {
-        m_queue.push(element);
-    }
-
     m_cond.notify_one();
 }
 
@@ -46,12 +42,7 @@ template <typename T>
 void TSQueue<T>::Pop(T& outElement)
 {
     boost::unique_lock<boost::mutex> lock(m_lock);
-
-    while (m_queue.empty())
-    {
-        m_cond.wait(lock);
-    }
-
+    m_cond.wait(lock, [this]{return !m_queue.empty();});
     m_queue.pop(outElement);
 }
 
@@ -59,7 +50,7 @@ template <>
 class TSQueue<Task*>
 {
 public:
-    TSQueue(size_t numElements = 10);
+    TSQueue(size_t numElements = 0);
     ~TSQueue();
     void Push(Task* task);
     void Pop(Task *&outTask);
@@ -72,19 +63,16 @@ private:
 
 inline void TSQueue<Task*>::Push(Task* task)
 {
-    boost::unique_lock<boost::mutex> lock(m_lock);
     m_queue.push(task);
+
+    boost::unique_lock<boost::mutex> lock(m_lock);
     m_condIsEmpty.notify_one();
 }
 
 inline void TSQueue<Task *>::Pop(Task*& outTask)
 {
     boost::unique_lock<boost::mutex> lock(m_lock);
-
-    while (m_queue.empty())
-    {
-        m_condIsEmpty.wait(lock);
-    }
+    m_condIsEmpty.wait(lock, [this]{return !m_queue.empty();});
     m_queue.pop(outTask);
 }
 

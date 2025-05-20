@@ -3,22 +3,15 @@
 #include "TaskQueue.hpp"
 
 ilrd::TaskQueue::TaskQueue() : m_numWorkers(0),
-                                m_delQueue(100),
-                                m_tasksQueue(100),
-                                m_isFinish(false),
-                                m_isRunning(false),
-                                m_threadsCount(0)
-{ }
+                                m_isFinish(false)
+{
+}
 
 ilrd::TaskQueue::~TaskQueue()
 {
     Stop();
-
-    while (!m_isFinish.load())
-    {
-        boost::unique_lock<boost::mutex> lock(m_lock);
-        m_condIsFinish.wait(lock);
-    }
+    // boost::unique_lock<boost::mutex> lock(m_lock);
+    // m_condIsFinish.wait(lock, [this]{return !m_isFinish.load();});
 }
 
 void ilrd::TaskQueue::AddTask(Task* task)
@@ -28,23 +21,23 @@ void ilrd::TaskQueue::AddTask(Task* task)
 
 void ilrd::TaskQueue::Start(size_t numWorkers)
 {
-    if (m_isRunning.load())
+    if (m_isRunning)
     {
         return;
     }
 
-    m_isRunning.store(true);
+    m_isRunning = true;
     m_numWorkers = numWorkers;
 
     for (size_t i = 0; i < numWorkers; ++i)
     {
-        m_threadsMap[i] = boost::thread(ThreadWork, boost::ref(*this), i);
+        m_threadsMap.emplace(i, boost::thread(ThreadWork, boost::ref(*this), i));
     }
 }
 
 void ilrd::TaskQueue::Stop()
 {
-    if (!m_isRunning.load())
+    if (!m_isRunning)
     {
         return;
     }
@@ -52,11 +45,9 @@ void ilrd::TaskQueue::Stop()
     // push destroy tasks
     for (size_t i = 0; i < m_numWorkers; ++i)
     {
-        Task* deathTask = new Task(boost::bind(&DestroyFunc,
-                                                    boost::ref(*this)));
+        Task* deathTask = new Task(DestroyFunc);
         m_tasksQueue.Push(deathTask);
     }
-
     size_t idx = 0;
 
     // join all threads
@@ -67,18 +58,21 @@ void ilrd::TaskQueue::Stop()
         m_threadsMap.erase(idx);
     }
 
-    m_isFinish.store(true);
-    m_condIsFinish.notify_all();
+    m_numWorkers = 0;
+    m_isRunning = false;
+    // m_isFinish.store(true);
+    // m_condIsFinish.notify_all();
 }
 
-void ilrd::TaskQueue::DestroyFunc(TaskQueue& taskQueue)
+void ilrd::TaskQueue::DestroyFunc()
 {
-    taskQueue.m_isRunning.store(false);
+    m_isRunning = false;
 }
 
 void ilrd::TaskQueue::ThreadWork(TaskQueue& taskQueue, size_t i)
 {
-    while (taskQueue.m_isRunning.load())
+    m_isRunning = true;
+    while (m_isRunning)
     {
         Task* runTask = nullptr;
         taskQueue.m_tasksQueue.Pop(runTask);
@@ -88,3 +82,5 @@ void ilrd::TaskQueue::ThreadWork(TaskQueue& taskQueue, size_t i)
 
     taskQueue.m_delQueue.Push(i);
 }
+
+thread_local bool ilrd::TaskQueue::m_isRunning = false;

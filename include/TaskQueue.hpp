@@ -25,15 +25,15 @@ private:
     TSQueue<size_t> m_delQueue;
     TSQueue<Task*> m_tasksQueue;
     boost::atomic_bool m_isFinish;
-    boost::atomic_bool m_isRunning;
     boost::atomic_uint m_threadsCount;
+    static thread_local bool m_isRunning;
     boost::condition_variable m_condIsFinish;
     boost::unordered_map<size_t, boost::thread> m_threadsMap;
 
     TaskQueue(const TaskQueue& other) = delete;
     TaskQueue& operator=(const TaskQueue& rhs) = delete;
 
-    static void DestroyFunc(TaskQueue& taskQueue);
+    static void DestroyFunc();
     static void ThreadWork(TaskQueue& taskQueue, size_t i);
 };  // class TaskQueue
 
