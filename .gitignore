@@ -15,4 +15,3 @@ cmake-build-*/
 # include directories
 #!*/
 !**/
-!bin/
