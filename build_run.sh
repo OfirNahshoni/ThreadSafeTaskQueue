@@ -5,6 +5,8 @@ if [ ! -d "build" ]; then
 fi
 
 cd build
+
 cmake ..
+
 make
 ./test/task_queue
