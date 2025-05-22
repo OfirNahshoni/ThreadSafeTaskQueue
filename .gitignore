@@ -11,6 +11,6 @@
 !CMakeLists.txt
 
 # include directories
-!*/
-#!**/
+#!*/
+!**/
 !bin/
