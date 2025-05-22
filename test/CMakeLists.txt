@@ -8,7 +8,7 @@ target_link_libraries(task_queue task_queue_static)
 #find_package(Boost REQUIRED COMPONENTS thread system chrono)
 
 set(BOOST_ROOT "C:/Boost")
-set(Boost_USE_STATIC_LIBS ON)  # Or OFF for shared
+set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost REQUIRED COMPONENTS thread system chrono)
 
 if(NOT Boost_FOUND)
@@ -20,8 +20,9 @@ target_include_directories(task_queue PRIVATE ${Boost_INCLUDE_DIRS})
 target_link_libraries(task_queue
         task_queue_static
         task_static
-        ${Boost_THREAD_LIBRARY}
-        ${Boost_SYSTEM_LIBRARY}
-        ${Boost_CHRONO_LIBRARY}
-        pthread
+        ${Boost_LIBRARIES}
+#        ${Boost_THREAD_LIBRARY}
+#        ${Boost_SYSTEM_LIBRARY}
+#        ${Boost_CHRONO_LIBRARY}
+#        pthread
 )
