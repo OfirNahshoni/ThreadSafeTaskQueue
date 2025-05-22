@@ -1,5 +1,7 @@
 # exclude everything
 *
+build/
+cmake-build-*/
 
 # include files
 !.gitignore
@@ -14,4 +16,3 @@
 #!*/
 !**/
 !bin/
-build/
