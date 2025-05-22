@@ -1,3 +1,7 @@
+/**
+ * file:
+ */
+
 #ifndef TASK_QUEUE_HPP
 #define TASK_QUEUE_HPP
 
@@ -23,7 +27,7 @@ private:
     size_t m_numWorkers;
     boost::mutex m_lock;
     TSQueue<size_t> m_delQueue;
-    TSQueue<Task*> m_tasksQueue;
+    TSQueue<Task*> m_tasksQueue;    //
     boost::atomic_bool m_isFinish;
     boost::atomic_uint m_threadsCount;
     static thread_local bool m_isRunning;

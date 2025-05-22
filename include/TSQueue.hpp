@@ -20,7 +20,7 @@ public:
     void Pop(T& outElement);
 
 private:
-    boost::mutex m_lock;
+    boost::mutex m_lock;    // m_mutex
     boost::condition_variable m_cond;
     boost::lockfree::queue<T> m_queue;
 };  // class TSQueue<T, Base>

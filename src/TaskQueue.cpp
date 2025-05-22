@@ -14,6 +14,7 @@ ilrd::TaskQueue::~TaskQueue()
     // m_condIsFinish.wait(lock, [this]{return !m_isFinish.load();});
 }
 
+// bool
 void ilrd::TaskQueue::AddTask(Task* task)
 {
     m_tasksQueue.Push(task);
@@ -31,6 +32,7 @@ void ilrd::TaskQueue::Start(size_t numWorkers)
 
     for (size_t i = 0; i < numWorkers; ++i)
     {
+        // ExecuteTask
         m_threadsMap.emplace(i, boost::thread(ThreadWork, boost::ref(*this), i));
     }
 }
