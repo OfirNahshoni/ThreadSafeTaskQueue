@@ -1,50 +1,52 @@
-#include <iostream>
 
 #include "TaskQueue.hpp"
 
-ilrd::TaskQueue::TaskQueue() : m_numWorkers(0),
-                                m_isFinish(false)
-{
-}
+thread_local bool ilrd::TaskQueue::m_isRunning = false;
 
 ilrd::TaskQueue::~TaskQueue()
 {
     Stop();
-    // boost::unique_lock<boost::mutex> lock(m_lock);
-    // m_condIsFinish.wait(lock, [this]{return !m_isFinish.load();});
 }
 
-// bool
-void ilrd::TaskQueue::AddTask(Task* task)
+bool ilrd::TaskQueue::AddTask(boost::function<void()> task)
 {
-    m_tasksQueue.Push(task);
+    return m_tasksQueue.Push(MakeTask(boost::move(task)));
 }
 
-void ilrd::TaskQueue::Start(size_t numWorkers)
+ilrd::Task* ilrd::TaskQueue::MakeTask(boost::function<void()> func)
 {
+    return new Task(boost::move(func));
+}
+
+void ilrd::TaskQueue::Start(ssize_t numWorkers)
+{
+    // handle double call to Start()
     if (m_isRunning)
     {
         return;
     }
 
     m_isRunning = true;
-    m_numWorkers = numWorkers;
 
-    for (size_t i = 0; i < numWorkers; ++i)
+    // handle bad input and return value from hardware_concurrency
+    m_numWorkers = (numWorkers <= 0) ? 1 : numWorkers;
+
+    for (size_t i = 0; i < m_numWorkers; ++i)
     {
-        // ExecuteTask
-        m_threadsMap.emplace(i, boost::thread(ThreadWork, boost::ref(*this), i));
+        m_threadsMap.emplace(i, boost::thread(ExecuteTasks,
+                                                    boost::ref(*this), i));
     }
 }
 
 void ilrd::TaskQueue::Stop()
 {
+    // handle double call to Stop()
     if (!m_isRunning)
     {
         return;
     }
 
-    // push destroy tasks
+    // push destroy-tasks to queue to pull-out all threads
     for (size_t i = 0; i < m_numWorkers; ++i)
     {
         Task* deathTask = new Task(DestroyFunc);
@@ -52,7 +54,7 @@ void ilrd::TaskQueue::Stop()
     }
     size_t idx = 0;
 
-    // join all threads
+    // pop each thread's index (from m_delQueue) and erase thread from the map
     for (size_t i = 0; i < m_numWorkers; ++i)
     {
         m_delQueue.Pop(idx);
@@ -62,27 +64,26 @@ void ilrd::TaskQueue::Stop()
 
     m_numWorkers = 0;
     m_isRunning = false;
-    // m_isFinish.store(true);
-    // m_condIsFinish.notify_all();
 }
 
 void ilrd::TaskQueue::DestroyFunc()
 {
+    // to pull-out thread from its loop
     m_isRunning = false;
 }
 
-void ilrd::TaskQueue::ThreadWork(TaskQueue& taskQueue, size_t i)
+void ilrd::TaskQueue::ExecuteTasks(TaskQueue& taskQueue, size_t i)
 {
     m_isRunning = true;
+
     while (m_isRunning)
     {
-        Task* runTask = nullptr;
+        Task* runTask;
         taskQueue.m_tasksQueue.Pop(runTask);
-        runTask->Run();
+
+        runTask->Execute();
         delete runTask;
     }
 
     taskQueue.m_delQueue.Push(i);
 }
-
-thread_local bool ilrd::TaskQueue::m_isRunning = false;

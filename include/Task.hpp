@@ -1,7 +1,8 @@
 #ifndef TASK_HPP
 #define TASK_HPP
 
-#include <boost/function/function0.hpp>        // boost::function<void()>
+#include <boost/shared_ptr.hpp>                 // boost::shared_ptr
+#include <boost/function/function0.hpp>         // boost::function<void()>
 
 namespace ilrd
 {
@@ -9,12 +10,9 @@ namespace ilrd
 class Task
 {
 public:
-    Task();
     explicit Task(boost::function<void()> func);
     ~Task();
-    Task(const Task& other);
-    Task& operator=(const Task& rhs);
-    void Run();    // TODO: implement from interface
+    void Execute();
 
 private:
     boost::function<void()>* m_func;

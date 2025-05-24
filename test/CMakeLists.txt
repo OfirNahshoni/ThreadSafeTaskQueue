@@ -1,11 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 project(TestTaskQueue)
 
-add_executable(task_queue TestTaskQueue.cpp
-)
+add_executable(task_queue TestTaskQueue.cpp)
 target_link_libraries(task_queue task_queue_static)
-
-#find_package(Boost REQUIRED COMPONENTS thread system chrono)
 
 set(BOOST_ROOT "C:/Boost")
 set(Boost_USE_STATIC_LIBS ON)
