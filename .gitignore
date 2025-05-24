@@ -1,7 +1,7 @@
 # exclude everything
 *
-build/
-cmake-build-*/
+build/*
+cmake-build-*/*
 
 # include files
 !.gitignore
