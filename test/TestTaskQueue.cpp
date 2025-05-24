@@ -2,7 +2,7 @@
 
 #include "TaskQueue.hpp"
 
-using namespace ilrd;
+using namespace ts_task_queue;
 
 void AddTasksToQueue(TaskQueue& taskQueue, size_t numTasks = 10);
 void TestsBasic();

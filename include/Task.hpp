@@ -1,23 +1,30 @@
+/**
+ * @file: Task.hpp
+ * @author: Ofir Nahshoni
+ * @brief: RAII wrapper over boost::function<void()>. This class owns a
+ * dynamically allocated boost::function and provides a callable interface.
+ * It's not copyable or moveable.
+ */
+
+
 #ifndef TASK_HPP
 #define TASK_HPP
 
-#include <boost/shared_ptr.hpp>                 // boost::shared_ptr
 #include <boost/function/function0.hpp>         // boost::function<void()>
 
-namespace ilrd
+namespace ts_task_queue
 {
 
 class Task
 {
 public:
     explicit Task(boost::function<void()> func);
-    ~Task();
     void Execute();
 
 private:
-    boost::function<void()>* m_func;
+    boost::function<void()> m_func;
 };  // class Task
 
-}   // namespace ilrd
+}   // namespace ts_task_queue
 
 #endif  // TASK_HPP

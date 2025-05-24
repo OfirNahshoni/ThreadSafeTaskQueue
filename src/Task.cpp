@@ -1,16 +1,10 @@
-
 #include "Task.hpp"
 
-ilrd::Task::Task(boost::function<void()> func) :
-                    m_func(new boost::function<void()>(func))
+ts_task_queue::Task::Task(boost::function<void()> func) :
+                                                        m_func(std::move(func))
 { }
 
-ilrd::Task::~Task()
+void ts_task_queue::Task::Execute()
 {
-    delete m_func;
-}
-
-void ilrd::Task::Execute()
-{
-    (*m_func)();
+    m_func();
 }

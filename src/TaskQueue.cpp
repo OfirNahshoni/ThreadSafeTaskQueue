@@ -1,24 +1,23 @@
-
 #include "TaskQueue.hpp"
 
-thread_local bool ilrd::TaskQueue::m_isRunning = false;
+thread_local bool ts_task_queue::TaskQueue::m_isRunning = false;
 
-ilrd::TaskQueue::~TaskQueue()
+ts_task_queue::TaskQueue::~TaskQueue()
 {
     Stop();
 }
 
-bool ilrd::TaskQueue::AddTask(boost::function<void()> task)
+bool ts_task_queue::TaskQueue::AddTask(boost::function<void()> task)
 {
     return m_tasksQueue.Push(MakeTask(boost::move(task)));
 }
 
-ilrd::Task* ilrd::TaskQueue::MakeTask(boost::function<void()> func)
+ts_task_queue::Task* ts_task_queue::TaskQueue::MakeTask(boost::function<void()> func)
 {
     return new Task(boost::move(func));
 }
 
-void ilrd::TaskQueue::Start(ssize_t numWorkers)
+void ts_task_queue::TaskQueue::Start(ssize_t numWorkers)
 {
     // handle double call to Start()
     if (m_isRunning)
@@ -38,7 +37,7 @@ void ilrd::TaskQueue::Start(ssize_t numWorkers)
     }
 }
 
-void ilrd::TaskQueue::Stop()
+void ts_task_queue::TaskQueue::Stop()
 {
     // handle double call to Stop()
     if (!m_isRunning)
@@ -66,13 +65,13 @@ void ilrd::TaskQueue::Stop()
     m_isRunning = false;
 }
 
-void ilrd::TaskQueue::DestroyFunc()
+void ts_task_queue::TaskQueue::DestroyFunc()
 {
     // to pull-out thread from its loop
     m_isRunning = false;
 }
 
-void ilrd::TaskQueue::ExecuteTasks(TaskQueue& taskQueue, size_t i)
+void ts_task_queue::TaskQueue::ExecuteTasks(TaskQueue& taskQueue, size_t i)
 {
     m_isRunning = true;
 
