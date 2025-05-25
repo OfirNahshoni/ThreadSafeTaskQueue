@@ -30,7 +30,7 @@ public:
      * @param numElements: Number of elements for internal buffer sizing.
      * zero means dynamically allocated nodes.
      */
-    TSQueue(size_t numElements = 0);
+    TSQueue(int numElements = 0);
     /**
      * @brief: Enqueues an element into the queue.
      * @param element: Element to push (copied).
@@ -51,7 +51,7 @@ private:
 };  // class TSQueue<T, Base>
 
 template<typename T>
-TSQueue<T>::TSQueue(size_t numElements) : m_queue(numElements)
+TSQueue<T>::TSQueue(int numElements) : m_queue(numElements)
 { }
 
 template <typename T>

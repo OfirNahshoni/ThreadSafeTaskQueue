@@ -17,7 +17,7 @@ ts_task_queue::Task* ts_task_queue::TaskQueue::MakeTask(boost::function<void()> 
     return new Task(boost::move(func));
 }
 
-void ts_task_queue::TaskQueue::Start(ssize_t numWorkers)
+void ts_task_queue::TaskQueue::Start(int numWorkers)
 {
     // handle double call to Start()
     if (m_isRunning)
@@ -30,7 +30,7 @@ void ts_task_queue::TaskQueue::Start(ssize_t numWorkers)
     // handle bad input and return value from hardware_concurrency
     m_numWorkers = (numWorkers <= 0) ? 1 : numWorkers;
 
-    for (size_t i = 0; i < m_numWorkers; ++i)
+    for (int i = 0; i < m_numWorkers; ++i)
     {
         m_threadsMap.emplace(i, boost::thread(ExecuteTasks,
                                                     boost::ref(*this), i));
@@ -46,15 +46,15 @@ void ts_task_queue::TaskQueue::Stop()
     }
 
     // push destroy-tasks to queue to pull-out all threads
-    for (size_t i = 0; i < m_numWorkers; ++i)
+    for (int i = 0; i < m_numWorkers; ++i)
     {
         Task* deathTask = new Task(DestroyFunc);
         m_tasksQueue.Push(deathTask);
     }
-    size_t idx = 0;
+    int idx = 0;
 
     // pop each thread's index (from m_delQueue) and erase thread from the map
-    for (size_t i = 0; i < m_numWorkers; ++i)
+    for (int i = 0; i < m_numWorkers; ++i)
     {
         m_delQueue.Pop(idx);
         m_threadsMap.at(idx).join();
@@ -71,7 +71,7 @@ void ts_task_queue::TaskQueue::DestroyFunc()
     m_isRunning = false;
 }
 
-void ts_task_queue::TaskQueue::ExecuteTasks(TaskQueue& taskQueue, size_t i)
+void ts_task_queue::TaskQueue::ExecuteTasks(TaskQueue& taskQueue, int i)
 {
     m_isRunning = true;
 

@@ -42,7 +42,7 @@ public:
      * hardware_concurrency() - 1. A value <= 0 falls back to 1.
      * @note: Calling this more than once has no effect.
      */
-    void Start(ssize_t numWorkers = boost::thread::hardware_concurrency() - 1);
+    void Start(int numWorkers = boost::thread::hardware_concurrency() - 1);
 
     /**
      * @brief: Stops the task executor. All running tasks finish before
@@ -52,15 +52,15 @@ public:
     void Stop();
 
 private:
-    size_t m_numWorkers;
-    TSQueue<size_t> m_delQueue;
+    int m_numWorkers;
+    TSQueue<int> m_delQueue;
     TSQueue<Task*> m_tasksQueue;
     static thread_local bool m_isRunning;
     boost::unordered_map<size_t, boost::thread> m_threadsMap;
 
     Task* MakeTask(boost::function<void()> func);
     static void DestroyFunc();
-    static void ExecuteTasks(TaskQueue& taskQueue, size_t i);
+    static void ExecuteTasks(TaskQueue& taskQueue, int i);
 
     TaskQueue(const TaskQueue& other) = delete;
     TaskQueue& operator=(const TaskQueue& rhs) = delete;

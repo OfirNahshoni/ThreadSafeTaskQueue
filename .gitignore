@@ -1,5 +1,6 @@
 # exclude everything
 *
+bin/*
 build/*
 cmake-build-*/*
 
@@ -11,7 +12,3 @@ cmake-build-*/*
 !*.hpp
 !*.md
 !CMakeLists.txt
-
-# include directories
-#!*/
-!**/

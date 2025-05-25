@@ -10,7 +10,7 @@
 #ifndef TASK_HPP
 #define TASK_HPP
 
-#include <boost/function/function0.hpp>         // boost::function<void()>
+#include <boost/function.hpp>         // boost::function<void()>
 
 namespace ts_task_queue
 {
