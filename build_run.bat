@@ -11,5 +11,5 @@ cd build
 cmake -G "NMake Makefiles" ..
 nmake
 
-..\bin\task_queue.exe
+.\test\task_queue.exe
 cd ..

@@ -6,19 +6,39 @@ designed for use in multi-threaded environments using the
 Boost library with C++11. <br /> 
 The queue ensures data integrity and proper handling of concurrent operations,
 making it ideal for applications requiring coordinated task execution.
+This mini-project has compact and easy-to-use API.
 
 ---
 
 # Requirements
-| Component      | Version       |
-|----------------|---------------|
-| **CMake**      | 3.20 or newer |
-| **Boost**      | 1.85.0+       |
-| **OS Support** | Windows (MSVC) / Linux (GCC) |
+| Component      | Version                               |
+|----------------|---------------------------------------|
+| **CMake**      | 3.20+                                 |
+| **Boost**      | 1.85.0+                               |
+| **Compiler**   | MSVC (Windows) / g++ (Linux)          |
+| **OS Support** | Windows (10+) / Linux (Ubuntu/Debian) |
 
 ---
 
-# Setup & Run
+# Setup Instructions
+
+## Boost installation
+You must install Boost manually:
+
+1. Download latest version of boost: 
+   - name: boost_1_88_0.zip
+   - link: [https://www.boost.org/users/download](https://www.boost.org/users/download)
+2. Extract it to: `C:\Libraries\boost_1_88_0` (or another preferred path)
+3. Open `x64 Native Tools Command Prompt for VS 2022` and run:
+```bash
+    > cd path/to/boost_1_88_0
+    > bootstrap.bat
+    > .\b2 build-type=complete --with-thread --with-chrono --with-system ^ 
+    > link=static runtime-link=static stage ^
+```
+---
+
+# Build & Run
 ### Windows
 1. open **x64 Native Tools Command Prompt for VS 2022**
 2. run the following:
