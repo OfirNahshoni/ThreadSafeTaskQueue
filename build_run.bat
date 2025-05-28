@@ -11,5 +11,5 @@ cd build
 cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release ..
 nmake
 
-.\bin\release\task_queue.exe
+..\bin\release\task_queue.exe
 cd ..
