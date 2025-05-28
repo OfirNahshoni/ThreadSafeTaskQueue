@@ -52,7 +52,9 @@ You must install Boost manually:
 ```bash
     > cd path/to/boost_1_88_0
     > bootstrap.bat
-    > .\b2 --toolset=msvc address-model=64 variant=release threading=multi runtime-link=static link=static --build-type=complete stage
+    > .\b2 --toolset=msvc address-model=64 variant=release threading=multi ^ 
+      --with-thread --with-chrono --with-system runtime-link=static ^ 
+      link=static --build-type=complete stage
 ```
 
 ### Linux

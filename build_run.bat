@@ -8,8 +8,8 @@ if exist build rmdir /s /q build
 mkdir build
 cd build
 
-cmake -G "NMake Makefiles" ..
+cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release ..
 nmake
 
-.\test\task_queue.exe
+.\bin\release\task_queue.exe
 cd ..
